@@ -7,7 +7,6 @@ router.post("/register", async (req, res) => {
   //Check miss infor
   if (!req.body.username || !req.body.email || !req.body.password)
     return res.status(404).send({ error: "Please input full infor" })
-  console.log(encrPassword("hello"))
 
   //Save to db
   const { username, email, password } = req.body
@@ -24,6 +23,31 @@ router.post("/register", async (req, res) => {
   } catch (error) {
     //Error wrong model require
     res.status(500).send({ error })
+  }
+})
+
+// LOGIN
+router.post("/login", async (req, res) => {
+  //Check miss infor
+  if (!req.body.username || !req.body.password)
+    return res.status(404).send({ error: "Please input full infor" })
+
+  try {
+    const { username, password: pwdLogin } = req.body
+
+    //Check username
+    const user = await User.findOne({ username })
+    if (!user) return res.status(401).json("Wrong  credentials!")
+
+    //Check password
+    const decrPwd = decrPassword(user.password)
+    if (decrPwd !== pwdLogin) return res.status(401).json("Wrong  credentials!")
+
+    //Login sucess (!not send pwd)
+    const { password, ...other } = user._doc
+    res.status(200).json(other)
+  } catch (error) {
+    res.status(500).json(error)
   }
 })
 
