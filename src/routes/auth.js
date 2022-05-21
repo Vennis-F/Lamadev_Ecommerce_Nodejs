@@ -1,6 +1,8 @@
 const User = require("../models/User")
 const router = require("express").Router()
+const jwt = require("jsonwebtoken")
 const { decrPassword, encrPassword } = require("../utils/utils")
+const { json } = require("express")
 
 // REGISTER
 router.post("/register", async (req, res) => {
@@ -43,9 +45,13 @@ router.post("/login", async (req, res) => {
     const decrPwd = decrPassword(user.password)
     if (decrPwd !== pwdLogin) return res.status(401).json("Wrong  credentials!")
 
+    //Push Jwt key
+    const { _id: id, isAdmin } = user
+    const accessToken = jwt.sign({ id, isAdmin }, process.env.SEC_JWT)
+
     //Login sucess (!not send pwd)
     const { password, ...other } = user._doc
-    res.status(200).json(other)
+    res.status(200).json({ ...other, accessToken })
   } catch (error) {
     res.status(500).json(error)
   }
