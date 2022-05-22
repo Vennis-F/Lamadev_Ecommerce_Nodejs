@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken")
 const { decrPassword, encrPassword } = require("../utils/utils")
 const { json } = require("express")
 
-// REGISTER
+// REGISTER (miss! error: wrong model)
 router.post("/register", async (req, res) => {
   //Check miss infor
   if (!req.body.username || !req.body.email || !req.body.password)

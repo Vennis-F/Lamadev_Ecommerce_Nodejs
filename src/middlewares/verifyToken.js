@@ -12,7 +12,7 @@ const verifyToken = (req, res, next) => {
   authHeader = authHeader.split(" ")[1]
   jwt.verify(authHeader, process.env.SEC_JWT, (err, user) => {
     //Check token valid
-    if (err) return res.status(403).json({ error: "You are not authenticated" })
+    if (err) return res.status(403).json({ error: "Token is not valid" })
 
     //Set token to requset
     req.user = user
@@ -20,12 +20,28 @@ const verifyToken = (req, res, next) => {
   })
 }
 
-//Check authorization: user_1 - admin_user
+//Check authorization: user_1 - admin_all
 const verifyTokenAndAuthorization = (req, res, next) => {
   verifyToken(req, res, () => {
-    if (req.user.id === req.params.id || isAdmin) {
+    if (req.user.id === req.params.id || req.user.isAdmin) {
       next()
-    } else return res.status(403).json({ error: "" })
+    } else
+      return res.status(403).json({ error: "You are not allow to do that" })
   })
 }
-module.exports = { verifyToken, verifyTokenAndAuthorization }
+
+//Check authorization: user_1 - admin_all
+const verifyTokenAndAdmin = (req, res, next) => {
+  verifyToken(req, res, () => {
+    if (req.user.isAdmin) {
+      next()
+    } else
+      return res.status(403).json({ error: "You are not allow to do that" })
+  })
+}
+
+module.exports = {
+  verifyToken,
+  verifyTokenAndAuthorization,
+  verifyTokenAndAdmin,
+}

@@ -13,4 +13,7 @@ const ProductSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
+//Unique field
+ProductSchema.index({ title: 1 }, { unique: true })
+
 module.exports = mongoose.model("Product", ProductSchema)
